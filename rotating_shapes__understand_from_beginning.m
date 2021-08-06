@@ -41,7 +41,7 @@ ylim([0, 5])
 set(gca, 'XTick', 0:5)
 set(gca, 'YTick', 0:5)
 
-store
+% store
 
 % source_coords=store(1).record_1()
 
@@ -105,7 +105,9 @@ for shape_count=[1:length(border)+1] % for shape_count=[1:length(border)+1]
 end
     
 
-% sorting store struct so items are similar if they are similar
+% sorting store struct first by sorting x values and sorting y values in the same way
+% then sorting x and y values together
+% this makes it easy to see if a rotation of a shape is the same as another rotation of this same shape
 
 for j=1:length(border)+1
     for i = 1:8
@@ -123,7 +125,7 @@ for j=1:length(border)+1
     end
 end
 
-
+%{
 % only keeping non-duplicated coords in store
 
 for shape_count=[1:length(border)+1] % for shape_count=[1:length(border)+1]
@@ -378,3 +380,4 @@ end
 
 through_record
         
+%}
