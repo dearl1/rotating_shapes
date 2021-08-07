@@ -1,3 +1,4 @@
+%{
 clear
 clc
 
@@ -31,7 +32,7 @@ for count=1:length(border)+1
 %     store(count).record_1
 end
 
-
+%{
 % practising outputting coordinates on grid
 figure(1)
 clf
@@ -40,6 +41,7 @@ xlim([0, 5])
 ylim([0, 5])
 set(gca, 'XTick', 0:5)
 set(gca, 'YTick', 0:5)
+%}
 
 % store
 
@@ -125,7 +127,7 @@ for j=1:length(border)+1
     end
 end
 
-%{
+
 % only keeping non-duplicated coords in store
 
 for shape_count=[1:length(border)+1] % for shape_count=[1:length(border)+1]
@@ -162,11 +164,14 @@ for j=1:length(border)+1
     end
 end  
 
+% all_orientations % outputs: 1x28 struct
+% size(all_orientations) % outputs: 1, 28
 
 % trying to find all placements of all orientations
 for shape_count=1:size(all_orientations,2) % for shape_count=1:28
     
-    widen=5-max(all_orientations(shape_count).record_1(:,1));
+    widen=5-max(all_orientations(shape_count).record_1(:,1)); % if a shape has an x co-ord at 5 then it spans the entire width of the 6 block board
+    % so widen would be 5-5=0
     heighten=5-max(all_orientations(shape_count).record_1(:,2));
     
     count=1;
@@ -223,25 +228,44 @@ end
 % we can reset the coords_available matrix with the coords_available_base matrix
 coords_available_base=coords_available;
 
+% at this point in the code: all_orientations is a 1x28 struct with 36 fields 
+% i.e. one of the shapes went up to ' all_orientations(i).record_36 ' because it was small and so it had many placements
 
-% made all_placements struct from all_orientations struct
+
+% make 'all_placements' struct from 'all_orientations' struct
 count=1;
 
-for j=1:size(all_orientations,2)
-    for i = 1:numel(fieldnames(all_orientations))
-        if length(all_orientations(j).(genvarname([strcat('record_',num2str(i))]))) ~= 0
+% size(all_orientations,2) % this outputs: 28
+    % Each of the 9 shapes was rotated and, after getting rid of duplicates, there were 28 'shape rotations'
+% numel(fieldnames(all_orientations)) % this outputs: 36
+    % of all the 28 'shape rotations' the one which has the most freedom to
+    % move around the board can be placed 36 times (because it's just a
+    % single block!)
+
+
+for j=1:size(all_orientations,2) % for each of the 28 'shape rotations'
+    for i = 1:numel(fieldnames(all_orientations)) % numel return the number of elements in an array (not the same as the function 'size')
+        if length(all_orientations(j).(genvarname([strcat('record_',num2str(i))]))) ~= 0 % not all of the 'shape rotations' had up to 36 placements
+                % for example, all but 1 of the .record_36 fields are 0.
+                % This is what this if statement is checking.
+                
             all_placements(count).record_1=all_orientations(j).(genvarname([strcat('record_',num2str(i))]));
             count=count+1;
         end
     end
 end  
 
+% at this point in the code: the all_placements struct is of size 1x625 and
+% has 1 field which is .record_1
+
 
 % finding the number of orientations per shape
 
-number_of_orientations=zeros(1,size(store,2));
+% remember that store is a struct of size 1x9 which has 8 fields
+    % it has the non-duplicate rotations of all 9 shapes.
+number_of_orientations=zeros(1,size(store,2)); % an array of 9 zeros
 
-for j=1:size(store,2)
+for j=1:size(store,2) % j goes from 1 through 9
     for i=1:8
         if length(store(j).(genvarname([strcat('record_',num2str(i))]))) ~= 0
             number_of_orientations(j)=number_of_orientations(j)+1;
@@ -254,10 +278,13 @@ end
 
 % finding the number of placements per orientation
 
-number_of_placements=zeros(1,size(all_orientations,2));
+size(all_orientations,2) % outputs: 28. Because there are 28 'shape rotations'.
+% When I say 'shape rotation' that is synonymous with 'an orientation' - as in: all_orientations has 28 elements
 
-for j=1:size(all_orientations,2)
-    for i=1:numel(fieldnames(all_orientations))
+number_of_placements=zeros(1,size(all_orientations,2)); % an array of 28 zeros.
+
+for j=1:size(all_orientations,2) % j goes from 1 through 28
+    for i=1:numel(fieldnames(all_orientations)) % i goes from 1 through 36
         if length(all_orientations(j).(genvarname([strcat('record_',num2str(i))]))) ~= 0
             number_of_placements(j)=number_of_placements(j)+1;
         end
@@ -271,19 +298,35 @@ end
 
 all_placements_borders=[1];
 
-for shape_count=1:size(store,2)-1
-    all_placements_borders=[all_placements_borders,all_placements_borders(shape_count)+sum(number_of_placements(1:number_of_orientations(1)))];
+% size(store,2) % outputs 9 because store is a 1x9 struct because there are 9 shapes.
+
+for shape_count=1:size(store,2)-1 % shape_count goes from 1 through 8
+    all_placements_borders=[all_placements_borders,all_placements_borders(shape_count) + sum( number_of_placements(1:number_of_orientations(1)) ) ];
     
+    % Number_of_orientations(1) is the number of orientations (aka shape rotations) that the first shape has
+    % The first, second and third orientations might have 2, 1 and 5
+        % placements as indicated by the array number_of_placements being equal to [2, 1, 5, ...]
+    % So the array all_placements_borders gets a new element which is the
+        % index of the place in the 625 (is it?) placements where the next shape starts
+    
+    % the below 2 lines shave off the start of the 2 arrays so that the in
+        % the next iteration of the for loop the next shape is dealt with
     number_of_placements(1:number_of_orientations(1))=[];
     number_of_orientations(1)=[];
 end
 
-all_placements_borders
+% all_placements_borders
 
 % sum(number_of_placements(1:sum(number_of_orientations(1:8))))+1
 
-save('variables')
+save('variables') % once this is run: this line of code and above can be commented out and the rest of the code can be run without having to run the above.
+%}
 
+
+% second half of code
+
+clear
+clc
 
 load('variables')
 
@@ -296,23 +339,25 @@ go=true
 while 1
 %     for whole_puzzle=1:size(store,2)
         
-    while go==true & all_placements_borders(whole_puzzle)<careful(whole_puzzle)-1
+    while go==true & all_placements_borders(whole_puzzle)<careful(whole_puzzle)-1 % 
     
         through_record=[];
         
-        for i=1:size(all_placements(all_placements_borders(whole_puzzle)).record_1,1) % for i=1:size(all_placements(all_placements_borders_base(whole_puzzle)).record_1,1)
+        for i=1:size( all_placements(all_placements_borders(whole_puzzle)).record_1, 1 ) % i goes from 1 through to the number of co-ords in a certain shape
             for through=1:size(coords_available,1)
-                if coords_available(through,:)==all_placements(all_placements_borders(whole_puzzle)).record_1(i,:)
+                if coords_available(through,:)==all_placements(all_placements_borders(whole_puzzle)).record_1(i,:) % check if a co-ordinate pair is free in coords_available
                    
-                    through_record=[through_record, through];
+                    through_record=[through_record, through]; % store what index in coords_available has co-ords which match a co-ord pair in the current placement
 %                     coords_available(through,:)=[-1,-1];
         
                 end
             end
         end
         
-        if length(through_record)==size(all_placements(all_placements_borders_base(whole_puzzle)).record_1,1)
-            coords_available(through_record,:)=repmat([-1,-1], [length(through_record),1]);
+        if length(through_record)==size(all_placements(all_placements_borders_base(whole_puzzle)).record_1,1) % check if all the co-ordinate pairs in the current placement are in through_record
+                % (as opposed to just some of the co-ords being able to fit in).
+                % i.e. that the current placement can completely fit in.
+            coords_available(through_record,:)=repmat([-1,-1], [length(through_record),1]); % replace all the co-ord pairs in coords_available which match with the co-ord pairs in the full placement with [-1, -1]
             go=false;
             
 %                 shape_record=;
