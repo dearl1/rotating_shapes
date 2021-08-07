@@ -339,7 +339,7 @@ go=true
 while 1
 %     for whole_puzzle=1:size(store,2)
         
-    while go==true & all_placements_borders(whole_puzzle)<careful(whole_puzzle)-1 % 
+    while go==true & all_placements_borders(whole_puzzle)<careful(whole_puzzle)-1
     
         through_record=[];
         
@@ -357,12 +357,12 @@ while 1
         if length(through_record)==size(all_placements(all_placements_borders_base(whole_puzzle)).record_1,1) % check if all the co-ordinate pairs in the current placement are in through_record
                 % (as opposed to just some of the co-ords being able to fit in).
                 % i.e. that the current placement can completely fit in.
-            coords_available(through_record,:)=repmat([-1,-1], [length(through_record),1]); % replace all the co-ord pairs in coords_available which match with the co-ord pairs in the full placement with [-1, -1]
-            go=false;
+            coords_available(through_record,:)=repmat([-1,-1], [length(through_record),1]); % replace all the co-ord pairs in coords_available which match with the co-ord pairs in the full placement with: [-1, -1]
+            go=false; % the current placement fits into the puzzle so don't try and fit another placement of the same shape into the puzzle
             
 %                 shape_record=;
         else
-            all_placements_borders(whole_puzzle)=all_placements_borders(whole_puzzle)+1;
+            all_placements_borders(whole_puzzle)=all_placements_borders(whole_puzzle)+1; % move on to the next placement of the current shape to see if it will fit in the puzzle
             
 %             % testing progress
 %             all_placements_borders
@@ -375,7 +375,7 @@ while 1
     
     if go==false & whole_puzzle==size(store,2)
         break
-    elseif go==true
+    elseif go==true % is this statement ever true??
         all_placements_borders(whole_puzzle:end)=all_placements_borders_base(whole_puzzle:end);
 %         whole_puzzle=whole_puzzle-1;    
         all_placements_borders(whole_puzzle-1)=all_placements_borders(whole_puzzle-1)+1;
@@ -392,22 +392,9 @@ end
 % below gives the index in all_placements to all 9 of the 'shape, orientation, placement's that solve the puzzle
 all_placements_borders
 
+%{
 
-a=[1,2;
-    3,4;
-    5,6;
-    7,8;
-    9,10];
-
-a([1,3],:)=repmat([0,0],[2,1]);
-a
-
-careful=[all_placements_borders(2:end),size(all_placements,2)]
-
-% repmat(a,[2,1])
-
-
-
+% new section
 % testing if 141th placement fits in
 
 through_record=[];
