@@ -373,31 +373,8 @@ while 1 % for temp_i = 1
 
         end
         
-        
-%         if length(through_record)==size(all_placements(all_placements_borders_base(whole_puzzle)).record_1,1) % check if all the co-ordinate pairs in the current placement are in through_record
-%                 % (as opposed to just some of the co-ords being able to fit in).
-%                 % i.e. that the current placement can completely fit in.
-%             coords_available(through_record,:)=repmat([-1,-1], [length(through_record),1]); % replace all the co-ord pairs in coords_available which match with the co-ord pairs in the full placement with: [-1, -1]
-%             go=false; % the current placement fits into the puzzle so don't try and fit another placement of the same shape into the puzzle
-            
-%             fprintf("Successfully placed shape %.0f\n", whole_puzzle)
-            
-            % testing progress
-%             all_placements_borders
-            
-%         else
-%             all_placements_borders(whole_puzzle)=all_placements_borders(whole_puzzle)+1; % move on to the next placement of the current shape to see if it will fit in the puzzle
-            
-%             % testing progress
-%             all_placements_borders
-        
     end
-        
-
-    
-    % testing progress
-%     all_placements_borders
-    
+  
     
     if go==false & whole_puzzle==size(store,2) % If whole_puzzle == 9 then the shape that we last tried to fit into the puzzle was the 9th and last shape
             % And if go == false that means that a placement of this 9th and last shape did successfully fit into the puzzle
@@ -405,6 +382,7 @@ while 1 % for temp_i = 1
         
         disp("Found a solution. See the 'all_placements_borders' array for the indices in the all_placements struct that give the placements which are a solution.")
         break
+        
     elseif go==true % if go == true then that means that the shape which we just tried to fit into the puzzle above did not fit in
             % So we need to redo the placing down of the previous shape. If redoing the placing down of this shape doesn't work this same section of code
             % (albeit at a later iteration) will make us redo the placing down of the shape before this one as well - and so on.
@@ -431,23 +409,6 @@ while 1 % for temp_i = 1
         
         % end of new code
         
-        
-        % old code
-        
-        % The method here is to make whole_puzzle go back to the start and go back to this while loop: while go==true & all_placements_borders(whole_puzzle) <= careful(whole_puzzle)-1
-            % You might be thinking that this is silly but it's not because all_placements_borders is left as it is (apart from making the
-            % 'last successfully placed shape' have its next placement tested) so all of the current successful placements of the shapes are kept
-            % and it's only the 'last successfully placed shape' which has its position changed.
-         
-%         all_placements_borders(whole_puzzle) = all_placements_borders_base(whole_puzzle); % this will mean that in the future, when we try to place the
-%             % current shape (which didn't fit at the moment), we will test all the placements of this shape from the start.
-% 
-%         all_placements_borders(whole_puzzle-1)=all_placements_borders(whole_puzzle-1)+1; % we will try to place the next placement along in the shape that was most recently successfully placed.
-%         whole_puzzle=1;
-%         coords_available=coords_available_base;
-        
-        % end of old code
-        
     else % go == false but whole_puzzle is not yet 9. So we need to try and place the next shape.
         
         % Required for new code:
@@ -468,24 +429,3 @@ disp("Finished main loop")
 % below gives the index in all_placements to all 9 of the 'shape, orientation, placement's that solve the puzzle
 % all_placements_borders
 
-
-%{
-% new section
-% testing if 141th placement fits in
-
-through_record=[];
-
-for i=1:size(all_placements(141).record_1,1)
-    for through=1:size(coords_available,1)
-        if coords_available(through,:)==all_placements(141).record_1(i,:)
-           
-            through_record=[through_record, through];
-%             coords_available(through,:)=[-1,-1];
-
-        end
-    end
-end
-
-through_record
-        
-%}
