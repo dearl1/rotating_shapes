@@ -344,37 +344,56 @@ while 1 % for temp_i = 1
     
         through_record=[];
         
-        for i=1:size( all_placements(all_placements_borders(whole_puzzle)).record_1, 1 ) % i goes from 1 through to the number of co-ords in a certain shape
-            for through=1:size(coords_available,1)
-                if coords_available(through,:)==all_placements(all_placements_borders(whole_puzzle)).record_1(i,:) % check if a co-ordinate pair is free in coords_available
-                   
-                    through_record=[through_record, through]; % store what index in coords_available has co-ords which match a co-ord pair in the current placement
-%                     coords_available(through,:)=[-1,-1];
-        
-                end
+        num_coords_in_placement = size( all_placements(all_placements_borders(whole_puzzle)).record_1, 1 );
+        for i=1:num_coords_in_placement % i goes from 1 through to the number of co-ords in a certain shape
+            look_for_this_co_ord_pair = all_placements(all_placements_borders(whole_puzzle)).record_1(i,:);
+            
+            % look at: 'Side_programs/test_look_for_co-ord_pair_in_coords_available.m' to understand the below section of code
+            ones_where_coords_match = coords_available==look_for_this_co_ord_pair; % same size as coords_available and has ones where either x or y from look_for_this_co_ord_pair match with an x or y in coords_available
+            two_where_coords_match = sum(ones_where_coords_match'); % size is 1x36 (if you have a 6x6=36 board). Has a 2 at the location where both x and y match together.
+            one_where_coord_matches = [two_where_coords_match == 2]'; % size is 36x1 (if you have a 6x6=36 board). Has zeros everywhere apart from a 1 at the location where both x and y match together.
+
+            if sum(one_where_coord_matches) == 0 % 'look_for_this_co_ord_pair' doesn't fit in the puzzle so the whole placement won't fit
+                all_placements_borders(whole_puzzle)=all_placements_borders(whole_puzzle)+1; % move on to the next placement of the current shape to see if it will fit in the puzzle
+
+                break % break out of the for loop because there's no point testing if the other co-ord pairs fit since we know at least one pair doesn't fit
+            
+            elseif sum(one_where_coord_matches) == 1 % 'look_for_this_co_ord_pair' does fit in the puzzle
+                through_record=[ through_record, find(one_where_coord_matches==1) ]; % store what index in coords_available has co-ords which match: 'look_for_this_co_ord_pair'
             end
+
         end
         
-        if length(through_record)==size(all_placements(all_placements_borders_base(whole_puzzle)).record_1,1) % check if all the co-ordinate pairs in the current placement are in through_record
-                % (as opposed to just some of the co-ords being able to fit in).
-                % i.e. that the current placement can completely fit in.
+        
+        if length(through_record)== num_coords_in_placement % if this is true then we got through the above for loop without being broken out of it.
+                % So that means all of the co-ord pairs in the current placement fit in the puzzle.
+
             coords_available(through_record,:)=repmat([-1,-1], [length(through_record),1]); % replace all the co-ord pairs in coords_available which match with the co-ord pairs in the full placement with: [-1, -1]
             go=false; % the current placement fits into the puzzle so don't try and fit another placement of the same shape into the puzzle
+
+        end
+        
+        
+%         if length(through_record)==size(all_placements(all_placements_borders_base(whole_puzzle)).record_1,1) % check if all the co-ordinate pairs in the current placement are in through_record
+%                 % (as opposed to just some of the co-ords being able to fit in).
+%                 % i.e. that the current placement can completely fit in.
+%             coords_available(through_record,:)=repmat([-1,-1], [length(through_record),1]); % replace all the co-ord pairs in coords_available which match with the co-ord pairs in the full placement with: [-1, -1]
+%             go=false; % the current placement fits into the puzzle so don't try and fit another placement of the same shape into the puzzle
             
 %             fprintf("Successfully placed shape %.0f\n", whole_puzzle)
             
             % testing progress
 %             all_placements_borders
             
-        else
-            all_placements_borders(whole_puzzle)=all_placements_borders(whole_puzzle)+1; % move on to the next placement of the current shape to see if it will fit in the puzzle
+%         else
+%             all_placements_borders(whole_puzzle)=all_placements_borders(whole_puzzle)+1; % move on to the next placement of the current shape to see if it will fit in the puzzle
             
 %             % testing progress
 %             all_placements_borders
         
-        end
-        
     end
+        
+
     
     % testing progress
 %     all_placements_borders
