@@ -331,15 +331,16 @@ clc
 load('variables')
 
 all_placements_borders_base=all_placements_borders;
-careful=[all_placements_borders(2:end),size(all_placements,2)];
+careful=[all_placements_borders(2:end), size(all_placements,2) + 1 ]; % this: 'size(all_placements,2) + 1' makes us go right up to the last placement in the struct all_placements in the code below
 
 whole_puzzle=1
 go=true
 
-while 1
-%     for whole_puzzle=1:size(store,2)
+disp("Starting main loop to try and find how the shapes fit into the puzzle")
+
+while 1 % for temp_i = 1
         
-    while go==true & all_placements_borders(whole_puzzle)<careful(whole_puzzle)-1
+    while go==true & all_placements_borders(whole_puzzle) <= careful(whole_puzzle)-1 % I think there needs to be a <= here
     
         through_record=[];
         
@@ -371,29 +372,63 @@ while 1
     end
     
     % testing progress
-    all_placements_borders
+%     all_placements_borders
     
-    if go==false & whole_puzzle==size(store,2)
+    
+    if go==false & whole_puzzle==size(store,2) % If whole_puzzle == 9 then the shape that we last tried to fit into the puzzle was the 9th and last shape
+            % And if go == false that means that a placement of this 9th and last shape did successfully fit into the puzzle
+            % So we can exit the 'while 1' loop
         break
-    elseif go==true % is this statement ever true??
-        all_placements_borders(whole_puzzle:end)=all_placements_borders_base(whole_puzzle:end);
-%         whole_puzzle=whole_puzzle-1;    
-        all_placements_borders(whole_puzzle-1)=all_placements_borders(whole_puzzle-1)+1;
+    elseif go==true % if go == true then that means that the shape which we just tried to fit into the puzzle above did not fit in
+            % So we need to redo the placing down of the previous shape. If redoing the placing down of this shape doesn't work this same section of code
+            % (albeit at a later iteration) will make us redo the placing down of the shape before this one as well - and so on.
+        
+        all_placements_borders(whole_puzzle) = all_placements_borders_base(whole_puzzle); % this will mean that in the future, when we try to place the
+            % current shape (which didn't fit at the moment), we will test all the placements of this shape from the start.
+        all_placements_borders(whole_puzzle-1)=all_placements_borders(whole_puzzle-1)+1; % we will try to place the next placement along in the shape that was most recently successfully placed.
+        
+        % We need to reset the coords_available array so that the co-ords which the 'last successfully placed shape' took are made available again
+            % for this 'last successfully placed shape' to be placed down again.
+        coords_available(through_record_store,:) = coords_available_base(through_record_store,:);
+            
+        whole_puzzle = whole_puzzle - 1; % now we can restart in this while loop: 'while go==true & all_placements_borders(whole_puzzle)<careful(whole_puzzle)-1'
+        
+        
+        % old code
+        % The method here is to make whole_puzzle go back to the start and go back to this while loop: while go==true & all_placements_borders(whole_puzzle) <= careful(whole_puzzle)-1
+            % You might be thinking that this is silly but it's not because all_placements_borders is left as it is (apart from making the
+            % 'last successfully placed shape' have its next placement tested) so all of the current successful placements of the shapes are kept
+            % and it's only the 'last successfully placed shape' which has its position changed.
+        
+%         all_placements_borders(whole_puzzle:end)=all_placements_borders_base(whole_puzzle:end);  
+        all_placements_borders(whole_puzzle) = all_placements_borders_base(whole_puzzle); % this will mean that in the future, when we try to place the
+            % current shape (which didn't fit at the moment), we will test all the placements of this shape from the start.
+
+        all_placements_borders(whole_puzzle-1)=all_placements_borders(whole_puzzle-1)+1; % we will try to place the next placement along in the shape that was most recently successfully placed.
         whole_puzzle=1;
         coords_available=coords_available_base;
-    else
+        
+        % end of old code
+        
+    else % go == false but whole_puzzle is not yet 9. So we need to try and place the next shape.
         whole_puzzle=whole_puzzle+1;
         go=true;
-    end
         
-%     end
+        % We need to store what through_record is just in case the current position of this successfully placed shape needs to be given a new position
+            % due to subsequent shapes not being able to fit
+        through_record_store = through_record;
+        
+    end
+
 end
 
+disp("Finished main loop")
+
 % below gives the index in all_placements to all 9 of the 'shape, orientation, placement's that solve the puzzle
-all_placements_borders
+% all_placements_borders
+
 
 %{
-
 % new section
 % testing if 141th placement fits in
 
