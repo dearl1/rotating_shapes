@@ -479,84 +479,69 @@ load("variables_2")
 fig_num = 0;
 
 disp("Beginning plotting")
-% for solution = 1 % for solution = [1:3]
-solution = 1;
+for solution = [1:3]
 
-fig_num = fig_num + 1;
-figure(fig_num)
-clf
-hold on
+    fig_num = fig_num + 1;
+    figure(fig_num)
+    clf
+    hold on
 
-% make struct called solution_coords with all the placements that solve the puzzle
-plot_this_all_placements_borders = store_all_placements_borders(solution, :);
+    % make struct called solution_coords with all the placements that solve the puzzle
+    plot_this_all_placements_borders = store_all_placements_borders(solution, :);
 
-clear solution_coords
-for i = 1:length(plot_this_all_placements_borders)
-    solution_coords(i).record_1 = all_placements( plot_this_all_placements_borders(i) ).record_1;
+    clear solution_coords
+    for i = 1:length(plot_this_all_placements_borders)
+        solution_coords(i).record_1 = all_placements( plot_this_all_placements_borders(i) ).record_1;
+    end
+
+    % for color codes I have used: https://www.rapidtables.com/web/color/RGB_Color.html
+    % plot the stumpers
+
+    set(gca, 'Units', 'Points');
+    axpos = get(gca,'Position');
+    fig_width = axpos(3);
+    fig_height = axpos(4);
+    fig_min_length = min([fig_width, fig_height]);
+
+    % MarkerSize is the area of the markers
+    MarkerSize = ( (fig_min_length/5)^0.5 - 0.3 )^2;
+
+    stumper_color_burlywood = [222, 184, 135]/255;
+    color = stumper_color_burlywood;
+    plot(stumpers(:, 1), stumpers(:, 2), 'o', 'MarkerSize', MarkerSize, 'MarkerEdgeColor', color, 'MarkerFaceColor', color)
+
+    % define shape colors
+    dark_blue = [0, 0, 255];
+    green = [0, 128, 0];
+    red = [255, 0, 0];
+    orange = [255, 69, 0];
+    grey = [169, 169, 169];
+    chocolate = [210, 105, 30];
+    yellow = [255, 255, 0];
+    purple = [128, 0, 128];
+    light_blue = [30, 144, 255];
+
+    shape_colors_temp = [dark_blue; green; red; orange; grey; chocolate; yellow; purple; light_blue];
+    shape_colors = shape_colors_temp/255;
+
+    % plot the shapes
+    for i = 1:size(solution_coords, 2)
+        color = shape_colors(i, :);        
+        x = solution_coords(i).record_1 (:, 1);
+        y = solution_coords(i).record_1 (:, 2);
+        plot(x, y, 's', 'MarkerSize', MarkerSize, 'MarkerEdgeColor', color, 'MarkerFaceColor', color);
+    end
+
+    
+    xlim([0, 5])
+    ylim([0, 5])
+
+    % remove axes
+    set(gca, 'XTick', [])
+    set(gca, 'YTick', [])
+
+
 end
-
-% for color codes I have used: https://www.rapidtables.com/web/color/RGB_Color.html
-% plot the stumpers
-
-set(gca, 'Units', 'Points');
-axpos = get(gca,'Position');
-fig_width = axpos(3);
-fig_height = axpos(4);
-fig_min_length = min([fig_width, fig_height]);
-% diff(xlim)
-
-% MarkerSize is the area of the markers
-MarkerSize = ( (fig_min_length/5)^0.5 - 0.3 )^2;
-
-stumper_color_burlywood = [222, 184, 135]/255;
-color = stumper_color_burlywood;
-plot(stumpers(:, 1), stumpers(:, 2), 'o', 'MarkerSize', MarkerSize, 'MarkerEdgeColor', color, 'MarkerFaceColor', color)
-
-% define shape colors
-dark_blue = [0, 0, 255];
-green = [0, 128, 0];
-red = [255, 0, 0];
-orange = [255, 69, 0];
-grey = [169, 169, 169];
-chocolate = [210, 105, 30];
-yellow = [255, 255, 0];
-purple = [128, 0, 128];
-light_blue = [30, 144, 255];
-
-shape_colors_temp = [dark_blue; green; red; orange; grey; chocolate; yellow; purple; light_blue];
-shape_colors = shape_colors_temp/255;
-
-% plot the shapes
-% for i = 1:8 % for i = 1:size(solution_coords, 2)
-%     color = shape_colors(i, :);
-%     shape_colors_temp(i, :)
-%     
-%     x = solution_coords(i).record_1 (:, 1)'
-%     y = solution_coords(i).record_1 (:, 2)'
-%     plot(x, y, 's', 'MarkerSize', MarkerSize, 'MarkerEdgeColor', color, 'MarkerFaceColor', color)
-%     disp("****************")
-% end
-
-
-i = 9;
-color = shape_colors(i, :);
-shape_colors_temp(i, :)
-
-x = solution_coords(i).record_1 (:, 1)'
-y = solution_coords(i).record_1 (:, 2)'
-plot(x, y, 's', 'MarkerSize', MarkerSize, 'MarkerEdgeColor', color, 'MarkerFaceColor', color)
-disp("****************")
-
-
-xlim([0, 5])
-ylim([0, 5])
-
-% remove axes
-set(gca, 'XTick', [])
-set(gca, 'YTick', [])
-
-
-% end
 
 disp("Finished plotting")
 
