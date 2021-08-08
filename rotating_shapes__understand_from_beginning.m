@@ -324,7 +324,7 @@ save('variables') % once this is run: this line of code and above can be comment
 
 
 % second half of code
-%{
+
 clear
 clc
 
@@ -333,14 +333,20 @@ load('variables')
 all_placements_borders_base=all_placements_borders;
 careful=[all_placements_borders(2:end), size(all_placements,2) + 1 ]; % this: 'size(all_placements,2) + 1' makes us go right up to the last placement in the struct all_placements in the code below
 
-whole_puzzle=1
-go=true
+whole_puzzle=1;
+store_all_placements_borders = [];
 
-disp("Starting main loop to try and find how the shapes fit into the puzzle")
-tic
+disp("Starting main loop to try and find all the possible solutions")
 while 1 % for temp_i = 1
+%     tic
+    go=true;
+    
+
+    
         
     while go==true & all_placements_borders(whole_puzzle) <= careful(whole_puzzle)-1 % I think there needs to be a <= here
+        
+%         disp("   check 1")
     
         through_record=[];
         
@@ -365,7 +371,7 @@ while 1 % for temp_i = 1
         end
         
         
-        if length(through_record)== num_coords_in_placement % if this is true then we got through the above for loop without being broken out of it.
+        if length(through_record) == num_coords_in_placement % if this is true then we got through the above for loop without being broken out of it.
                 % So that means all of the co-ord pairs in the current placement fit in the puzzle.
 
             coords_available(through_record,:)=repmat([-1,-1], [length(through_record),1]); % replace all the co-ord pairs in coords_available which match with the co-ord pairs in the full placement with: [-1, -1]
@@ -377,18 +383,44 @@ while 1 % for temp_i = 1
   
     
     if go==false & whole_puzzle==size(store,2) % If whole_puzzle == 9 then the shape that we last tried to fit into the puzzle was the 9th and last shape
-            % And if go == false that means that a placement of this 9th and last shape did successfully fit into the puzzle
-            % So we can exit the 'while 1' loop
+            % And if go == false that means that a placement of this 9th and last shape did successfully fit into the puzzle.
         
+%         disp("   check 2")
+%         fprintf("   whole_puzzle: %.0f \n", whole_puzzle)
+
+        disp("   **************************")
+        disp("                             ")
         disp("Found a solution. See the 'all_placements_borders' array for the indices in the all_placements struct that give the placements which are a solution.")
-        break
+        disp("all_placements_borders is...")
+        disp(all_placements_borders)
+        disp("")
+        disp("all_placements_borders_base is...")
+        disp(all_placements_borders_base)
+        
+        all_placements_borders(whole_puzzle)=all_placements_borders(whole_puzzle)+1; % move on to the next placement of the current shape to see if it will fit in the puzzle
+        
+        % We need to reset the coords_available array so that the co-ords which the 'last successfully placed shape' (which was the 9th shape) took are
+            % made available again for the 9th shape to be placed down again.
+        coords_available( through_record , : ) = coords_available_base( through_record , : );
+        % Btw: through_record is an array which currently has what indices in coords_available has co-ords which match the 9th shape
+        
+        % I need to save the current all_placements_borders array in a big array.
+        store_all_placements_borders = [store_all_placements_borders;
+                                        all_placements_borders];
+        
+        % Now we go down to print how long it took to find this solution and then we go back to 'while 1' to do another big loop to look for
+            % another solution.
         
     elseif go==true % if go == true then that means that the shape which we just tried to fit into the puzzle above did not fit in
             % So we need to redo the placing down of the previous shape. If redoing the placing down of this shape doesn't work this same section of code
             % (albeit at a later iteration) will make us redo the placing down of the shape before this one as well - and so on.
+            
+%         disp("   check 3")
+%         fprintf("   whole_puzzle: %.0f \n", whole_puzzle)
+%         fprintf("   all_placements_borders: %.0f \n", all_placements_borders)
         
         if whole_puzzle == 1 % This means that we have just tried to fit the first shape into the puzzle and it didn't fit which must mean 
-            % it's impossible to solve the puzzle
+            % it's impossible to solve the puzzle or we have finished finding all the solutions.
             
             disp("We have been bumped up to the first shape and it could not be placed.")
             break
@@ -411,6 +443,8 @@ while 1 % for temp_i = 1
         
     else % go == false but whole_puzzle is not yet 9. So we need to try and place the next shape.
         
+%         disp("   check 4")
+        
         % Required for new code:
         % We need to store what through_record is just in case the current position of this successfully placed shape needs to be given a new position
             % due to subsequent shapes not being able to fit
@@ -423,17 +457,19 @@ while 1 % for temp_i = 1
     end
 
 end
-fprintf("Time required to find solution: %.2f\n", toc)
+
+% fprintf("Time required to find solution: %.2f\n", toc)
 disp("Finished main loop")
 
-% below gives the index in all_placements to all 9 of the 'shape, orientation, placement's that solve the puzzle
-% all_placements_borders
+% store_all_placements_borders is an array of all of the all_placements_borders which give the index in all_placements to all 9 of the
+    % 'shape, orientation, placement's that solve the puzzle
 
 
-save("variables_2")
-%}
+% save("variables_2")
 
-% output the solution on a grid
+
+%{
+% output one solution on a grid
 clear
 clc
 
@@ -498,7 +534,7 @@ ylim([0, 5])
 set(gca, 'XTick', [])
 set(gca, 'YTick', [])
 
-
+%}
 
 
 
