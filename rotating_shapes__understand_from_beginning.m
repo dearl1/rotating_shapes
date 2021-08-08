@@ -324,7 +324,7 @@ save('variables') % once this is run: this line of code and above can be comment
 
 
 % second half of code
-
+%{
 clear
 clc
 
@@ -428,4 +428,86 @@ disp("Finished main loop")
 
 % below gives the index in all_placements to all 9 of the 'shape, orientation, placement's that solve the puzzle
 % all_placements_borders
+
+
+save("variables_2")
+%}
+
+% output the solution on a grid
+clear
+clc
+
+load("variables_2")
+
+disp("Output the solution on a grid in a figure")
+
+fig_num = 0;
+
+fig_num = fig_num + 1;
+figure(fig_num)
+clf
+hold on
+
+% make struct called solution_coords with all the placements that solve the puzzle
+for i = 1:length(all_placements_borders)
+    solution_coords(i).record_1 = all_placements( all_placements_borders(i) ).record_1;
+end
+
+% for color codes I have used: https://www.rapidtables.com/web/color/RGB_Color.html
+% plot the stumpers
+
+set(gca, 'Units', 'Points');
+axpos = get(gca,'Position');
+fig_width = axpos(3);
+fig_height = axpos(4);
+fig_min_length = min([fig_width, fig_height])
+% diff(xlim)
+
+% MarkerSize is the area of the markers
+MarkerSize = ( (fig_min_length/5)^0.5 - 0.3 )^2;
+
+stumper_color_burlywood = [222, 184, 135]/255;
+color = stumper_color_burlywood;
+plot(stumpers(:, 1), stumpers(:, 2), 'o', 'MarkerSize', MarkerSize, 'MarkerEdgeColor', color, 'MarkerFaceColor', color)
+
+% define shape colors
+dark_blue = [0, 0, 255];
+green = [0, 128, 0];
+red = [255, 0, 0];
+orange = [255, 69, 0];
+grey = [169, 169, 169];
+chocolate = [210, 105, 30];
+yellow = [255, 255, 0];
+purple = [128, 0, 128];
+light_blue = [30, 144, 255];
+
+shape_colors = [dark_blue; green; red; orange; grey; chocolate;, yellow; purple; light_blue]/255;
+
+% plot the shapes
+for i = 1:size(solution_coords, 2)
+    color = shape_colors(i, :);
+    x = solution_coords(i).record_1 (:, 1);
+    y = solution_coords(i).record_1 (:, 2);
+    plot(x, y, 's', 'MarkerSize', MarkerSize, 'MarkerEdgeColor', color, 'MarkerFaceColor', color)
+end
+
+xlim([0, 5])
+ylim([0, 5])
+
+% remove axes
+set(gca, 'XTick', [])
+set(gca, 'YTick', [])
+
+
+
+
+
+
+
+
+
+
+
+
+
 
