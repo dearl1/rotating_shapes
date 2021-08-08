@@ -4,17 +4,17 @@ clc
 
 % change the 1s and 2s in: shapes.csv
 
-stumpers=[0,0; 0,2; 1,4; 2,3; 4,1; 5,3; 5,4];
-% stumpers = [];
+% stumpers=[0,0; 0,2; 1,4; 2,3; 4,1; 5,3; 5,4];
+stumpers = [];
 
-board_width = 6;
-board_height = 6;
+board_width = 8;
+board_height = 8;
 
 % shapes_to_placements(stumpers, board_width, board_height)
 
 % find_solutions()
 
-plot_figures()
+% plot_figures()
 
 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
@@ -489,16 +489,26 @@ function plot_figures()
 
         % define shape colors
         dark_blue = [0, 0, 255];
-        green = [0, 128, 0];
+        dark_green = [0, 102, 0];
+        light_green = [102, 255, 102];
         red = [255, 0, 0];
         orange = [255, 69, 0];
         grey = [169, 169, 169];
         chocolate = [210, 105, 30];
         yellow = [255, 255, 0];
         purple = [128, 0, 128];
+        magenta = [153, 0, 153];
         light_blue = [30, 144, 255];
 
-        shape_colors_temp = [dark_blue; green; red; orange; grey; chocolate; yellow; purple; light_blue];
+        shape_colors_temp = [dark_blue;
+                             dark_green;
+                             light_green;
+                             purple;
+                             magenta;
+                             red;
+                             orange;
+                             yellow];
+                         
         shape_colors = shape_colors_temp/255;
 
         % plot the shapes
