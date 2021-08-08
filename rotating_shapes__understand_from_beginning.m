@@ -3,6 +3,7 @@ clear
 clc
 
 % change the 1s and 2s in: shapes.csv
+% no 2 at the start, no 2 at the end but put 2s in between each shape
 
 % stumpers=[0,0; 0,2; 1,4; 2,3; 4,1; 5,3; 5,4];
 stumpers = [];
