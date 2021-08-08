@@ -324,7 +324,7 @@ save('variables') % once this is run: this line of code and above can be comment
 
 
 % second half of code
-
+%{
 clear
 clc
 
@@ -341,9 +341,7 @@ while 1 % for temp_i = 1
 %     tic
     go=true;
     
-
     
-        
     while go==true & all_placements_borders(whole_puzzle) <= careful(whole_puzzle)-1 % I think there needs to be a <= here
         
 %         disp("   check 1")
@@ -397,16 +395,16 @@ while 1 % for temp_i = 1
         disp("all_placements_borders_base is...")
         disp(all_placements_borders_base)
         
+        % I need to save the current all_placements_borders array in a big array.
+        store_all_placements_borders = [store_all_placements_borders;
+                                        all_placements_borders];
+        
         all_placements_borders(whole_puzzle)=all_placements_borders(whole_puzzle)+1; % move on to the next placement of the current shape to see if it will fit in the puzzle
         
         % We need to reset the coords_available array so that the co-ords which the 'last successfully placed shape' (which was the 9th shape) took are
             % made available again for the 9th shape to be placed down again.
         coords_available( through_record , : ) = coords_available_base( through_record , : );
         % Btw: through_record is an array which currently has what indices in coords_available has co-ords which match the 9th shape
-        
-        % I need to save the current all_placements_borders array in a big array.
-        store_all_placements_borders = [store_all_placements_borders;
-                                        all_placements_borders];
         
         % Now we go down to print how long it took to find this solution and then we go back to 'while 1' to do another big loop to look for
             % another solution.
@@ -466,18 +464,23 @@ disp("Finished main loop")
 
 
 % save("variables_2")
+%}
+
+% save("variables_2")
 
 
-%{
-% output one solution on a grid
+% output solution(s) to figure(s)
+
 clear
 clc
 
 load("variables_2")
 
-disp("Output the solution on a grid in a figure")
-
 fig_num = 0;
+
+disp("Beginning plotting")
+% for solution = 1 % for solution = [1:3]
+solution = 1;
 
 fig_num = fig_num + 1;
 figure(fig_num)
@@ -485,8 +488,11 @@ clf
 hold on
 
 % make struct called solution_coords with all the placements that solve the puzzle
-for i = 1:length(all_placements_borders)
-    solution_coords(i).record_1 = all_placements( all_placements_borders(i) ).record_1;
+plot_this_all_placements_borders = store_all_placements_borders(solution, :);
+
+clear solution_coords
+for i = 1:length(plot_this_all_placements_borders)
+    solution_coords(i).record_1 = all_placements( plot_this_all_placements_borders(i) ).record_1;
 end
 
 % for color codes I have used: https://www.rapidtables.com/web/color/RGB_Color.html
@@ -496,7 +502,7 @@ set(gca, 'Units', 'Points');
 axpos = get(gca,'Position');
 fig_width = axpos(3);
 fig_height = axpos(4);
-fig_min_length = min([fig_width, fig_height])
+fig_min_length = min([fig_width, fig_height]);
 % diff(xlim)
 
 % MarkerSize is the area of the markers
@@ -517,15 +523,30 @@ yellow = [255, 255, 0];
 purple = [128, 0, 128];
 light_blue = [30, 144, 255];
 
-shape_colors = [dark_blue; green; red; orange; grey; chocolate;, yellow; purple; light_blue]/255;
+shape_colors_temp = [dark_blue; green; red; orange; grey; chocolate; yellow; purple; light_blue];
+shape_colors = shape_colors_temp/255;
 
 % plot the shapes
-for i = 1:size(solution_coords, 2)
-    color = shape_colors(i, :);
-    x = solution_coords(i).record_1 (:, 1);
-    y = solution_coords(i).record_1 (:, 2);
-    plot(x, y, 's', 'MarkerSize', MarkerSize, 'MarkerEdgeColor', color, 'MarkerFaceColor', color)
-end
+% for i = 1:8 % for i = 1:size(solution_coords, 2)
+%     color = shape_colors(i, :);
+%     shape_colors_temp(i, :)
+%     
+%     x = solution_coords(i).record_1 (:, 1)'
+%     y = solution_coords(i).record_1 (:, 2)'
+%     plot(x, y, 's', 'MarkerSize', MarkerSize, 'MarkerEdgeColor', color, 'MarkerFaceColor', color)
+%     disp("****************")
+% end
+
+
+i = 9;
+color = shape_colors(i, :);
+shape_colors_temp(i, :)
+
+x = solution_coords(i).record_1 (:, 1)'
+y = solution_coords(i).record_1 (:, 2)'
+plot(x, y, 's', 'MarkerSize', MarkerSize, 'MarkerEdgeColor', color, 'MarkerFaceColor', color)
+disp("****************")
+
 
 xlim([0, 5])
 ylim([0, 5])
@@ -534,10 +555,10 @@ ylim([0, 5])
 set(gca, 'XTick', [])
 set(gca, 'YTick', [])
 
-%}
 
+% end
 
-
+disp("Finished plotting")
 
 
 
