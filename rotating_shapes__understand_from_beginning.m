@@ -11,9 +11,12 @@ stumpers = [];
 board_width = 8;
 board_height = 8;
 
+% comment or uncomment the function calls below
+
 % shapes_to_placements(stumpers, board_width, board_height)
 
-% find_solutions()
+% load('variables')
+find_solutions()
 
 % plot_figures()
 
@@ -172,8 +175,8 @@ function shapes_to_placements(stumpers, board_width, board_height)
 
     count=1;
 
-    for j=0:5
-        for i=0:5
+    for j=0:board_width - 1
+        for i=0:board_height - 1
             coords_available(count,:)=[j,i];
             count=count+1;
         end
@@ -308,6 +311,11 @@ function find_solutions()
     store_all_placements_borders = [];
 
     disp("Starting main loop to try and find all the possible solutions")
+    disp("   initial all_placements_borders before it is changed ...")
+    disp(all_placements_borders)
+    disp("   **************************")
+    disp("")
+    
     while 1 % for temp_i = 1
     %     tic
         go=true;
@@ -386,9 +394,23 @@ function find_solutions()
                 % So we need to redo the placing down of the previous shape. If redoing the placing down of this shape doesn't work this same section of code
                 % (albeit at a later iteration) will make us redo the placing down of the shape before this one as well - and so on.
 
-    %         disp("   check 3")
-    %         fprintf("   whole_puzzle: %.0f \n", whole_puzzle)
-    %         fprintf("   all_placements_borders: %.0f \n", all_placements_borders)
+%             disp("   check 3")
+%             fprintf("   whole_puzzle: %.0f \n", whole_puzzle)
+%             disp("   all_placements_borders ...")
+%             disp(all_placements_borders)
+            
+            
+            level_of_check_progress = 2;
+            if all_placements_borders(level_of_check_progress) ~= all_placements_borders_base(level_of_check_progress) % This just makes sure that the below text isn't output too often
+                fprintf("   whole_puzzle: %.0f \n", whole_puzzle)
+                disp("   all_placements_borders ...")
+                disp(all_placements_borders)
+                
+                disp("")
+                percentage_progress = ( all_placements_borders(level_of_check_progress) - all_placements_borders_base(level_of_check_progress) ) / ( all_placements_borders_base(level_of_check_progress+1) - all_placements_borders_base(level_of_check_progress) ) * 100;
+                fprintf("Percentage of the way through index %.0f: %.1f \n", level_of_check_progress, percentage_progress)
+            end
+            
 
             if whole_puzzle == 1 % This means that we have just tried to fit the first shape into the puzzle and it didn't fit which must mean 
                 % it's impossible to solve the puzzle or we have finished finding all the solutions.
