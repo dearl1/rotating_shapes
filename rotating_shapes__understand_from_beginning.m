@@ -309,6 +309,9 @@ function find_solutions()
 
     whole_puzzle=1;
     store_all_placements_borders = [];
+    
+    percentage_progress = 0;
+    prev_percentage_progress = 0;
 
     disp("Starting main loop to try and find all the possible solutions")
     disp("   initial all_placements_borders before it is changed ...")
@@ -400,15 +403,19 @@ function find_solutions()
 %             disp(all_placements_borders)
             
             
-            level_of_check_progress = 2;
-            if all_placements_borders(level_of_check_progress) ~= all_placements_borders_base(level_of_check_progress) % This just makes sure that the below text isn't output too often
+            % output progress
+            level_of_check = 2;
+            percentage_progress = ( all_placements_borders(level_of_check) - all_placements_borders_base(level_of_check) ) / ( all_placements_borders_base(level_of_check+1) - all_placements_borders_base(level_of_check) ) * 100;
+%             if all_placements_borders(level_of_check) ~= all_placements_borders_base(level_of_check) % This just makes sure that the below text isn't output too often
+            if percentage_progress > prev_percentage_progress
                 fprintf("   whole_puzzle: %.0f \n", whole_puzzle)
                 disp("   all_placements_borders ...")
                 disp(all_placements_borders)
                 
                 disp("")
-                percentage_progress = ( all_placements_borders(level_of_check_progress) - all_placements_borders_base(level_of_check_progress) ) / ( all_placements_borders_base(level_of_check_progress+1) - all_placements_borders_base(level_of_check_progress) ) * 100;
-                fprintf("Percentage of the way through index %.0f: %.1f \n", level_of_check_progress, percentage_progress)
+                fprintf("Percentage of the way through index %.0f: %.1f \n", level_of_check, percentage_progress)
+                
+                prev_percentage_progress = percentage_progress;
             end
             
 
