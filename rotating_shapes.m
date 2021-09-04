@@ -295,7 +295,6 @@ function shapes_to_placements(stumpers, board_width, board_height)
     disp("")
 end
 
-
 % second half of code
 function find_solutions()
 
@@ -470,8 +469,6 @@ function find_solutions()
     disp("")
 
 end
-
-
 
 
 % output solution(s) to figure(s)
